@@ -1,0 +1,57 @@
+name: Rodagem de ofertas Shopee
+
+on:
+  schedule:
+    # Horários em UTC (Brasília = UTC-3). Cada rodagem começa ~10 min antes do
+    # horário desejado, porque o GitHub costuma atrasar disparos agendados.
+    - cron: "50 7 * * *"    # 04:50 Brasília -> posts por volta das 05:00
+    - cron: "20 10 * * *"   # 07:20 Brasília -> posts por volta das 07:30
+    - cron: "50 12 * * *"   # 09:50 Brasília -> posts por volta das 10:00
+    - cron: "50 14 * * *"   # 11:50 Brasília -> posts por volta das 12:00
+    - cron: "50 17 * * *"   # 14:50 Brasília -> posts por volta das 15:00
+    - cron: "50 19 * * *"   # 16:50 Brasília -> posts por volta das 17:00
+    - cron: "50 21 * * *"   # 18:50 Brasília -> posts por volta das 19:00
+  workflow_dispatch:
+    inputs:
+      args:
+        description: 'Opções extras (ex: --dry-run  ou  --only natura,vendas)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+# Nunca deixa duas rodagens ao mesmo tempo (evitaria posts duplicados)
+concurrency:
+  group: rodagem-ofertas
+  cancel-in-progress: false
+
+jobs:
+  postar-ofertas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Rodar o bot
+        env:
+          SHOPEE_APP_ID: ${{ secrets.SHOPEE_APP_ID }}
+          SHOPEE_APP_SECRET: ${{ secrets.SHOPEE_APP_SECRET }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          EXTRA_ARGS: ${{ github.event.inputs.args }}
+          # O WhatsApp Cloud API fica desligado (WHATSAPP_ENABLED padrão = false).
+          # Os links dos grupos e as demais regras usam os padrões do código.
+        run: python main.py $EXTRA_ARGS
