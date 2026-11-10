@@ -70,16 +70,16 @@ class SelectorTests(unittest.TestCase):
         self.assertTrue(selector.is_good_offer(offer(shopType=[]), 5))
 
     def test_marca_limita_por_loja_e_nao_repete(self):
-        pool = [offer(itemId=i, shopId=i % 3, priceDiscountRate=50 - i) for i in range(1, 13)]
+        pool = [offer(itemId=i, shopId=i % 5, priceDiscountRate=50 - i) for i in range(1, 13)]
         used = set()
         chosen, passed = selector.pick_brand(pool, "natura", set(), used)
-        self.assertEqual(len(chosen), 5)
+        self.assertEqual(len(chosen), selector.BRAND_COUNT)
         self.assertEqual(passed, 12)
         per_shop = {}
         for o in chosen:
             per_shop[o["shopId"]] = per_shop.get(o["shopId"], 0) + 1
         self.assertLessEqual(max(per_shop.values()), 2)
-        self.assertEqual(len(used), 5)
+        self.assertEqual(len(used), selector.BRAND_COUNT)
 
         # segunda chamada (outro bloco) não pode repetir as já usadas
         chosen2, _ = selector.pick_brand(pool, "natura", set(), used)
@@ -108,6 +108,15 @@ class SelectorTests(unittest.TestCase):
         self.assertEqual(vendas[0]["itemId"], 2)
         self.assertEqual(desconto[0]["itemId"], 3)
         self.assertEqual(comissao[0]["itemId"], 3)
+
+    def test_shopee_totaliza_50_por_rodagem(self):
+        brands = selector.BRAND_COUNT * len(selector.BRANDS)
+        general = sum(selector.GENERAL_COUNTS.values())
+        self.assertEqual(brands + general, selector.SHOPEE_TARGET)
+        self.assertEqual(selector.SHOPEE_TARGET, 50)
+        pool = [offer(itemId=i, shopId=i % 5, priceDiscountRate=25 + i % 10, sales=100 + i) for i in range(1, 40)]
+        chosen, _ = selector.pick_general(pool, "desconto", set(), set())
+        self.assertEqual(len(chosen), selector.GENERAL_COUNTS["desconto"])
 
 
 if __name__ == "__main__":

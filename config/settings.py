@@ -79,6 +79,12 @@ class Settings:
     # Uma oferta enviada não volta a ser escolhida por este número de dias
     COOLDOWN_DAYS = _get_int("COOLDOWN_DAYS", 3)
 
+    # ---- Rakuten Advertising (OPCIONAL: sem as duas primeiras, a Rakuten fica desligada) ----
+    # RAKUTEN_TOKEN_KEY = base64 de "client_id:client_secret"; ACCOUNT_ID = o SID do site.
+    RAKUTEN_TOKEN_KEY = _get("RAKUTEN_TOKEN_KEY")
+    RAKUTEN_ACCOUNT_ID = _get("RAKUTEN_ACCOUNT_ID")
+    RAKUTEN_ENABLED = bool(_get("RAKUTEN_TOKEN_KEY") and _get("RAKUTEN_ACCOUNT_ID"))
+
     # ---- WhatsApp Cloud API (DESLIGADO por padrão: evita custo no cartão) ----
     # Para religar: WHATSAPP_ENABLED=true e preencher as variáveis abaixo.
     WHATSAPP_ENABLED = _get_bool("WHATSAPP_ENABLED", False)

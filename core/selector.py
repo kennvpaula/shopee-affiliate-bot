@@ -5,8 +5,9 @@ Mexa nas constantes abaixo para deixar o filtro mais rígido ou mais solto.
 import unicodedata
 
 # ---------------------------------------------------------------- ajustes
-BRAND_COUNT = 5      # ofertas por marca em cada rodagem
-GENERAL_COUNT = 3    # ofertas por lista geral (desconto, vendas, comissão)
+BRAND_COUNT = 7      # ofertas por marca em cada rodagem
+GENERAL_COUNTS = {"desconto": 8, "vendas": 7, "comissao": 7}  # listas gerais: 22
+SHOPEE_TARGET = 50   # total por rodagem (marcas 28 + gerais 22); o que faltar nas marcas vai pro top desconto
 
 MAX_DISCOUNT = 60    # acima disso o desconto é tratado como suspeito (preço "de" inflado)
 BRAND_MIN_DISCOUNT = 5
@@ -186,8 +187,9 @@ _GENERAL_SORT = {
 }
 
 
-def pick_general(pool, key, blocked_ids, used_ids, count=GENERAL_COUNT):
+def pick_general(pool, key, blocked_ids, used_ids, count=None):
     """Escolhe até `count` ofertas da lista geral (desconto, vendas ou comissao)."""
+    count = count or GENERAL_COUNTS[key]
     candidates = _eligible(
         pool, blocked_ids, used_ids, lambda o: True, GENERAL_MIN_DISCOUNT[key]
     )

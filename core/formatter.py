@@ -1,4 +1,4 @@
-"""Transforma dados da oferta Shopee em texto pronto pra postar."""
+"""Transforma dados das ofertas (Shopee e Rakuten) em texto pronto pra postar."""
 
 # Nomes de produto da Shopee costumam vir cheios de palavras-chave repetidas.
 # Cortamos pra manter o post limpo, como nos exemplos curados à mão.
@@ -27,12 +27,17 @@ def truncate_name(name: str, max_length: int = MAX_PRODUCT_NAME_LENGTH) -> str:
     return name[: max_length - 3].rstrip() + "..."
 
 
-def clean_name(name: str) -> str:
-    """Tira símbolos que o WhatsApp interpretaria como formatação (*, ~, _) e corta o tamanho."""
+def clean_text(text: str) -> str:
+    """Tira símbolos que o WhatsApp interpretaria como formatação (*, ~, _)."""
     for symbol in ("*", "~"):
-        name = name.replace(symbol, "")
-    name = name.replace("_", " ")
-    return truncate_name(" ".join(name.split()))
+        text = text.replace(symbol, "")
+    text = text.replace("_", " ")
+    return " ".join(text.split())
+
+
+def clean_name(name: str) -> str:
+    """Limpa os símbolos e corta o tamanho do nome do produto."""
+    return truncate_name(clean_text(name))
 
 
 def current_price(offer: dict) -> float | None:
@@ -80,7 +85,10 @@ def format_post_caption(
     """
     name = clean_name(offer.get("productName") or "Produto")
     price = current_price(offer)
-    original = compute_original_price(price, offer.get("priceDiscountRate"))
+    # Rakuten informa o preço "De" real (original_price); Shopee só dá o % de desconto
+    original = _to_float(offer.get("original_price"))
+    if not original or not price or original <= price:
+        original = compute_original_price(price, offer.get("priceDiscountRate"))
     link = offer.get("offerLink") or offer.get("productLink") or ""
 
     lines = [f"🏁 {name}", ""]
@@ -91,8 +99,12 @@ def format_post_caption(
     coupon = offer.get("coupon_code")
     if coupon:
         lines += ["", f"🎫 Cupom: {coupon}"]
+    coupon_lines = offer.get("coupon_lines") or []  # cupons da Rakuten que se aplicam ao produto
+    if coupon_lines:
+        lines += [""] + coupon_lines
 
-    lines += ["", "Link com desconto ↘️", link]
+    # Sem preço "De" não há desconto garantido: o rótulo não promete desconto
+    lines += ["", "Link com desconto ↘️" if original else "Link ↘️", link]
 
     if whatsapp_group_link:
         lines += ["", "🔥 *VAGAS NO GRUPO DO WHATSAPP NESSE LINK:*", whatsapp_group_link]

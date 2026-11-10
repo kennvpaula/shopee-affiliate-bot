@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       args:
-        description: 'Opções extras (ex: --dry-run  ou  --only natura,vendas)'
+        description: 'Opções extras (ex: --dry-run | --rakuten | --only natura,netshoes)'
         required: false
         default: ''
 
@@ -51,7 +51,17 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          EXTRA_ARGS: ${{ github.event.inputs.args }}
+          # Rakuten (opcional): sem estes dois Secrets a rodagem segue só com a Shopee
+          RAKUTEN_TOKEN_KEY: ${{ secrets.RAKUTEN_TOKEN_KEY }}
+          RAKUTEN_ACCOUNT_ID: ${{ secrets.RAKUTEN_ACCOUNT_ID }}
+          SCHEDULE: ${{ github.event.schedule }}
+          MANUAL_ARGS: ${{ github.event.inputs.args }}
           # O WhatsApp Cloud API fica desligado (WHATSAPP_ENABLED padrão = false).
           # Os links dos grupos e as demais regras usam os padrões do código.
-        run: python main.py $EXTRA_ARGS
+        run: |
+          ARGS="$MANUAL_ARGS"
+          # A Rakuten entra só nas rodagens das 5h e das 12h (cron 07:50 e 14:50 UTC)
+          if [ "$SCHEDULE" = "50 7 * * *" ] || [ "$SCHEDULE" = "50 14 * * *" ]; then
+            ARGS="--rakuten"
+          fi
+          python main.py $ARGS
