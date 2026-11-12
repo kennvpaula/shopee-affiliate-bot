@@ -1,0 +1,108 @@
+
+============================================================
+MARCA: NATURA
+============================================================
+40 produtos retornados, 40 com a marca no nome.
+
+Lojas (nome | shopId | tipo | qtd de produtos):
+  On Perfumes e Cosméticos | 341032766 | vendedor comum | 6
+  Natura.Beauty | 1590879011 | PREFERRED | 4
+  KALLON PERFUMARIA STORE | 888193609 | vendedor comum | 2
+  JA Multimarcas cosméticos | 534211929 | vendedor comum | 2
+  O Rei dos Catálogos | 556314920 | PREFERRED | 2
+  Kantinhoafg | 593327261 | PREFERRED | 2
+  mateusrevendedor | 1273696985 | vendedor comum | 1
+  kellyperfumaria000 | 1487590844 | PREFERRED | 1
+  leticiacosmeticosbr | 361316943 | vendedor comum | 1
+  Jô cosméticos e perfumaria | 541424110 | vendedor comum | 1
+
+Top 8 por desconto:
+  63% OFF | nota 4.9 | comissão 3.0% | PREFERRED (Carlas Cosméticos) | R$ 79.9 | Natura KIT 03 Desodorante Corporal Natura Homem  100 ml Cada
+  62% OFF | nota 4.9 | comissão 3.0% | PREFERRED (CLICK.SMART) | R$ 15 | NATURA KIT DE VÁLVULA SPRAY COMPATÍVEIS COM REFIL DESORANTE 
+  58% OFF | nota 5 | comissão 3.0% | vendedor comum (SIL.BEAUTY) | R$ 27.9 | Desodorante Corporal NATURA HOMEM, KAIAK OCEANO, ESSENCIAL, 
+  49% OFF | nota 5 | comissão 3.0% | vendedor comum (On Perfumes e Cosméticos) | R$ 199 | Perfume Masculino Natura Homem Aromaticos Perfume Natura Ori
+  46% OFF | nota 5 | comissão 3.0% | vendedor comum (On Perfumes e Cosméticos) | R$ 79 | Perfume Humor Próprio Natura Original Perfume Feminino Natur
+  40% OFF | nota 4.9 | comissão 3.0% | PREFERRED (Kantinhoafg) | R$ 45.54 | Natura Creme Hidratante Ameixa E Flor De Baunilha 400ml - Na
+  40% OFF | nota 4.9 | comissão 3.0% | PREFERRED (Kantinhoafg) | R$ 45.54 | Natura Hidratante Corporal Cereja E Avelã 400ml - Natura Tod
+  36% OFF | nota 5 | comissão 3.0% | vendedor comum (On Perfumes e Cosméticos) | R$ 29.9 | Creme de Mãos Natura  40g Natura Luna Natura Humor Rosa Natu
+
+============================================================
+MARCA: BOTICARIO
+============================================================
+42 produtos retornados, 42 com a marca no nome.
+
+Lojas (nome | shopId | tipo | qtd de produtos):
+  Lê Parfam Cosméticos e Variedades | 471891334 | vendedor comum | 5
+  On Perfumes e Cosméticos | 341032766 | vendedor comum | 4
+  Loja da Helô Vestido e Perfume | 219304287 | vendedor comum | 3
+  Glamour Presentes Oficial | 464910461 | PREFERRED | 2
+  Natália França Cosmético Perfumaria | 376977989 | vendedor comum | 1
+  Loraine Sales Beleza & Cuidados | 426598905 | PREFERRED | 1
+  Promoções da Dê✨️ | 1101768409 | vendedor comum | 1
+  LojaEspaçoE | 456986789 | PREFERRED | 1
+  Olfato Chic Cosméticos e Presentes | 379639013 | vendedor comum | 1
+  D'Essência Cosméticos | 409299491 | vendedor comum | 1
+
+Top 8 por desconto:
+  23% OFF | nota 5 | comissão 3.0% | vendedor comum (On Perfumes e Cosméticos) | R$ 72.9 | Deleite Chocolatudo O Boticário Hidratante e Sabonete Kit Ch
+  20% OFF | nota 5 | comissão 3.0% | vendedor comum (On Perfumes e Cosméticos) | R$ 84 | Body Splash Cuide se Bem Deleite O Boticário Original Body S
+  15% OFF | nota 5 | comissão 3.0% | vendedor comum (Loja da Helô Vestido e Perfume) | R$ 178.5 | Uomini  tradicional o Boticario e Uomini Black o Boticário
+  13% OFF | nota 5 | comissão 3.0% | vendedor comum (VL COSMÉTICOS E PRESENTES) | R$ 34.9 | DesodoranteO Boticário - Antitranspirante Aerosol Lily Tradi
+  13% OFF | nota 4 | comissão 3.0% | vendedor comum (Venancio  e Venancio) | R$ 76.9 | Cuide-se Bem Feira Banana o Boticário - Loção Desodorante Hi
+  12% OFF | nota 5 | comissão 3.0% | vendedor comum (On Perfumes e Cosméticos) | R$ 159 | Perfume Boticário Portinari Colônia O Boticário
+  9% OFF | nota 5 | comissão 3.0% | vendedor comum (On Perfumes e Cosméticos) | R$ 209 | Perfume Floratta Red Passion O Boticário Original Perfume Fe
+  5% OFF | nota 4.9 | comissão 3.0% | PREFERRED (Loraine Sales Beleza & Cuidados) | R$ 66.41 | REFIL LOÇÃO NUTRITIVA DESODORANTE O BOTICÁRIO NATIVA SPA  35
+
+============================================================
+MARCA: WEPINK
+============================================================
+80 produtos retornados, 66 com a marca no nome.
+
+Lojas (nome | shopId | tipo | qtd de produtos):
+  MAGAZINE PRISCILA MODA | 1375781499 | vendedor comum | 3
+  A Dora Semijoias e Acessórios | 404149837 | vendedor comum | 3
+  Cheiro Radiance | 293708180 | vendedor comum | 3
+  anadamazioperfumes | 297634105 | vendedor comum | 3
+  Utilidades de Casa | 219430848 | vendedor comum | 3
+  Allure perfumes  | 424273308 | vendedor comum | 3
+  LUMI ACESSÓRIOS. | 662647832 | vendedor comum | 2
+  GGM Artigos | 760351911 | vendedor comum | 2
+  Mademoiselle.Store | 241902942 | vendedor comum | 2
+  Ca.Fernandes | 494501403 | vendedor comum | 2
+
+Top 8 por desconto:
+  27% OFF | nota 4.6 | comissão 3.0% | vendedor comum (Loja Ponto Chique) | R$ 29 | Body Splash Inspiração We Pink Virgínia - Liberty Rosé | Lib
+  25% OFF | nota 5 | comissão 3.0% | PREFERRED (Evenpharma) | R$ 14.9 | Blush Facial We Candy We Pink Alta Pigmentação Textura Avelu
+  21% OFF | nota 5 | comissão 3.0% | vendedor comum (LUMI ACESSÓRIOS.) | R$ 33.51 | Body Splash Wepink Virginia Fonseca 200ml Golden Tropical Li
+  20% OFF | nota 5 | comissão 3.0% | vendedor comum (Mundo Della's) | R$ 29.9 | Body Splash Feminino Inspiração Liberté VF Golden Obsessed V
+  19% OFF | nota 4 | comissão 3.0% | vendedor comum (LUMI ACESSÓRIOS.) | R$ 30.27 | Body Splash Feminino Inspiração Liberté VF Golden Obsessed P
+  0% OFF | nota 4.7 | comissão 12.0% | vendedor comum (MAGAZINE PRISCILA MODA) | R$ 79.9 | Body Splash 130Ml Virginia Fragrância Sweet Love Perfume Col
+  0% OFF | nota 5 | comissão 3.0% | vendedor comum (Aroma em Gotas) | R$ 4.9 | Body Splash Wepink VF Golden - Original.
+  0% OFF | nota 5 | comissão 3.0% | vendedor comum (MFE_STORESHOP) | R$ 60 | Body Splash WePink 200ml Originak
+
+============================================================
+MARCA: EUDORA
+============================================================
+40 produtos retornados, 40 com a marca no nome.
+
+Lojas (nome | shopId | tipo | qtd de produtos):
+  On Perfumes e Cosméticos | 341032766 | vendedor comum | 5
+  safira make-up | 1055351603 | PREFERRED | 4
+  LojaEspaçoE | 456986789 | PREFERRED | 3
+  camargo_vendas | 303947819 | vendedor comum | 2
+  Alessandra Ambrosio Limeira | 495286381 | vendedor comum | 2
+  Thaty cosméticos | 417493006 | vendedor comum | 1
+  swerbine | 759000432 | vendedor comum | 1
+  HeloisaChaim | 790749442 | vendedor comum | 1
+  Edda Moda e Cosméticos | 1317492187 | vendedor comum | 1
+  gabelacosmeticos | 328310523 | vendedor comum | 1
+
+Top 8 por desconto:
+  73% OFF | nota 0 | comissão 18.0% | vendedor comum (Sua Amiga Brasil) | R$ 30.9 | Pó Solto Eudora Eudora Niina Secrets Eudora Perfect Match Co
+  57% OFF | nota 4.9 | comissão 3.0% | PREFERRED (Nayara Consultoria) | R$ 30.9 | Body Spray Eudora 100ml Body Splash Eudora Lançamento
+  43% OFF | nota 4.7 | comissão 10.0% | PREFERRED (Ale Rodrigues Cosméticos) | R$ 79.99 | Creme Hidratante Eudora Absolu 200g Creme Corporal Roxinho E
+  42% OFF | nota 5 | comissão 10.0% | PREFERRED (Vie.sagesse) | R$ 69.9 | Eudora Siàge Hair-Plastia Máscara Capilar 250g - Eudora
+  32% OFF | nota 0 | comissão 3.0% | vendedor comum (On Perfumes e Cosméticos) | R$ 159.9 | Eau de Parfum Eudora Perfume Eudora Alta Fixação Eudora Roug
+  31% OFF | nota 5 | comissão 3.0% | PREFERRED (Beleza Top Store) | R$ 32.9 | Body Spray Eudora Desodorante Feminino 100ml | Imensi, Lyra,
+  19% OFF | nota 0 | comissão 3.0% | vendedor comum (On Perfumes e Cosméticos) | R$ 80.9 | Eudora Siage Hair Plastia Shampoo Eudora Condicionador Eudor
+  17% OFF | nota 0 | comissão 3.0% | vendedor comum (swerbine) | R$ 49.9 | Eudora Body Spray Feminino - Eudora Diva Esplêndida - Eudora

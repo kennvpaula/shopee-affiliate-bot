@@ -77,7 +77,8 @@ class ShopeeClient:
             ),
         }
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=2), reraise=True)
+    # O erro 10000 ("System Error") é do lado da Shopee e costuma passar sozinho: 4 tentativas, esperando 3, 6 e 12 s
+    @retry(stop=stop_after_attempt(4), wait=wait_exponential(multiplier=3, max=15), reraise=True)
     def _execute(self, query: str, variables: dict | None = None) -> dict:
         body = {"query": query, "variables": variables or {}}
         # separators sem espaço: a assinatura é feita sobre essa string exata

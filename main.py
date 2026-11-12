@@ -34,7 +34,7 @@ from db.supabase_client import get_recent_item_ids, mark_as_sent
 PAGE_SIZE = 20
 BRAND_PAGES = 3    # páginas por busca de marca (Shopee)
 GENERAL_PAGES = 5  # páginas por lista geral (Shopee)
-FETCH_DELAY = 0.4  # pausa entre consultas à Shopee (evita estourar o limite deles)
+FETCH_DELAY = 1.0  # pausa entre consultas à Shopee (mais lenta: a Shopee devolveu muitos "System Error" com 0,4 s)
 RAKUTEN_PAGE_SIZE = 100
 RAKUTEN_MAX_FAIL_STREAK = 3  # depois de 3 falhas seguidas, desiste da Rakuten nesta rodagem
 STATE = {"fetch_errors": 0, "rakuten_fail_streak": 0, "rakuten_down": False}
@@ -357,6 +357,8 @@ def run(only: set[str] | None = None, dry_run: bool = False, include_rakuten: bo
         print("\n[FIM] Simulação: nada foi enviado nem gravado.")
         return 0
 
+    if STATE["fetch_errors"]:
+        print(f"[AVISO] {STATE['fetch_errors']} busca(s) falharam nesta rodagem (erro da Shopee/Rakuten): alguns blocos podem ter vindo com menos ofertas.")
     print(f"[FIM] {sent} de {total} oferta(s) postada(s) no Telegram.")
     if total == 0 and STATE["fetch_errors"]:
         return 1  # as buscas falharam e nada foi escolhido: o GitHub deve marcar a rodagem como falha

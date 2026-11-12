@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       args:
-        description: '--dry-run --rakuten'
+        description: 'Opções extras (ex: --dry-run | --rakuten | --only natura,netshoes)'
         required: false
         default: ''
 

@@ -1,0 +1,52 @@
+[TOKEN] OK (so com scope). Expira em 3600 s. Veio refresh_token: sim.
+
+================================================================
+1) ANUNCIANTES EM QUE VOCE ESTA APROVADO (Brasil, rede 8)
+================================================================
+8 parceria(s) ativa(s) na rede do Brasil.
+  mid 43984 | Netshoes WL | Apparel, Clothing, Collectibles, Equipment
+  mid 43985 | Zattini WL | Accessories, Children, Jewelry, Men, Women
+  mid 54199 | LojaNBA | Accessories, Children, Clothing, Men, Women
+  mid 54196 | Santos Store | Accessories, Children, Clothing, Men, Women
+  mid 54162 | São Store | Accessories, Children, Men, Women
+  mid 54200 | Shop Timao | Accessories, Clothing, Men, Women
+  mid 54198 | Cruzeiro Store | Accessories, Children, Clothing, Men, Women
+  mid 54197 | Inter Store | Accessories, Children, Clothing, Men, Women
+
+================================================================
+2) RECURSOS DE CADA ANUNCIANTE (API Advertisers v2)
+================================================================
+130 anunciante(s) listados na rede do Brasil.
+  mid 43984 | Netshoes WL | feed de produtos: True | deep links: True | entrega em: ['BR'] | site: https://www.netshoes.com.br/
+  mid 43985 | Zattini WL | feed de produtos: True | deep links: True | entrega em: None | site: https://www.zattini.com.br/
+  mid 54199 | LojaNBA | feed de produtos: True | deep links: True | entrega em: ['BR'] | site: https://www.lojanba.com/
+  mid 54196 | Santos Store | feed de produtos: True | deep links: True | entrega em: ['BR'] | site: https://www.santosstore.com.br/
+  mid 54162 | São Store | feed de produtos: True | deep links: True | entrega em: ['BR'] | site: https://www.saostore.com.br/
+  mid 54200 | Shop Timao | feed de produtos: True | deep links: True | entrega em: ['BR'] | site: https://www.shoptimao.com.br/
+  mid 54198 | Cruzeiro Store | feed de produtos: True | deep links: True | entrega em: ['BR'] | site: https://loja.cruzeiro.com.br/
+  mid 54197 | Inter Store | feed de produtos: True | deep links: True | entrega em: ['BR'] | site: https://www.lojadointer.com.br/
+
+ATENCAO: a API nao informa as regras de divulgacao (grupos de mensagem, cupons etc.).
+Leia os termos de cada programa no painel (Anunciantes) antes de liberar.
+
+================================================================
+3) PRODUTOS (Product Search) POR ANUNCIANTE
+================================================================
+
+--- Netshoes WL (mid 43984) ---
+Total no feed: 1281521 | lidos: 100 | moedas: BRL | em promocao (saleprice menor que price): 0
+Campos de cada produto: mid, merchantname, linkid, createdon, sku, productname, category, price, saleprice, upccode, description, keywords, linkurl, imageurl
+Link vem de: click.linksynergy.com | com imagem: 100/100
+
+================================================================
+4) CUPONS (Coupon Feed, rede 8 = Brasil)
+================================================================
+Total: 7 | lidos: 7 | validos agora: 7 | validos de anunciantes aprovados: 7 | com campo de codigo: 2
+Campos encontrados em cada cupom: advertiserid, advertisername, categories, category, clickurl, couponcode, impressionpixel, network, offerdescription, offerenddate, offerstartdate, promotiontype, promotiontypes
+  Zattini WL | ate 31/10 | ['Desconto'] | codigo: (nao veio) | Ganhe 15% OFF na lista em todo o site* (Cupom: TOPZAT)! | link: click.linksynergy.com
+  Zattini WL | ate 02/02 | ['Liquidação'] | codigo: PRIMEIRA10 | Primeira Compra com 10% OFF( CUPOM)! | link: click.linksynergy.com
+  Zattini WL | ate 02/03 | ['Desconto'] | codigo: (nao veio) | Compre 1 item da lista e leve um mimo por R$9,99! | link: click.linksynergy.com
+  Zattini WL | ate 02/03 | ['Brinde'] | codigo: (nao veio) | Acima de R$ 239, LEVE 1 carteira por R$ 1! | link: click.linksynergy.com
+  Netshoes WL | ate 21/06 | ['Liquidação'] | codigo: BEMVINDO10 | Cupom de 10% OFF na primeira compra (Cupom) - Validade: Indeterminada! | link: click.linksynergy.com
+  Netshoes WL | ate 07/11 | ['Desconto'] | codigo: (nao veio) | Under Armor Com Até 30% Off! | link: click.linksynergy.com
+  Netshoes WL | ate 07/11 | ['Desconto'] | codigo: (nao veio) | 5% Em Itens Asics! | link: click.linksynergy.com

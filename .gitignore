@@ -3,7 +3,3 @@ venv/
 __pycache__/
 *.pyc
 .DS_Store
-
-resultado_rakuten.txt
-resultado_marcas.txt
-diagnostico_*.txt

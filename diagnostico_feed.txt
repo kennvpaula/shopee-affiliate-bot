@@ -1,0 +1,34 @@
+
+================================================================
+NETSHOES (mid 43984)
+================================================================
+800 itens lidos (4 termos: tênis, camisa, nike, adidas).
+
+Motivo pelo qual cada item passou ou foi barrado:
+    800  sem preco valido
+
+Itens com preco promocional menor que o normal: 0 de 800
+
+Exemplos de itens (nome | price | saleprice):
+  Tênis Esportivo Leve Masculino Respirável Conforto Diár | 89.99 | 0.0
+  Tênis Esportivo Leve Masculino Respirável Conforto Diár | 99.99 | 0.0
+  Tenis Esportivo Masculino New Pro Fast Corrida Preto e  | 99.99 | 0.0
+  Tênis Esportivo Leve Masculino Respirável Conforto Diár | 89.99 | 0.0
+  Tenis Esportivo Masculino New Pro Fast Corrida Preto e  | 99.99 | 0.0
+
+================================================================
+ZATTINI (mid 43985)
+================================================================
+724 itens lidos (4 termos: tênis, camisa, nike, adidas).
+
+Motivo pelo qual cada item passou ou foi barrado:
+    724  preco promocional IGUAL ao normal (sem promocao)
+
+Itens com preco promocional menor que o normal: 0 de 724
+
+Exemplos de itens (nome | price | saleprice):
+  Tênis Mizuno Wave Titan 3 Masculino - Masculino | 249.99 | 249.99
+  Tênis Rainha Abbey Unissex - Unissex | 211.1 | 211.1
+  Tênis Lacoste L001 Feminino - Feminino | 499.99 | 499.99
+  Tênis Infantil Avura Fun Menino - Masculino | 79.99 | 79.99
+  Tênis Spark SK7010 Feminino - Feminino | 149.99 | 149.99

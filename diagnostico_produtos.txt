@@ -1,0 +1,54 @@
+
+================================================================
+camiseta-adidas-corrida-grafica-verde-FBA-83DX-060
+================================================================
+Codigo do produto: FBA-83DX-060 | palavras do nome: camiseta adidas corrida grafica verde
+Achei no feed (4 item(ns), 1 nome(s)) buscando por: 'camiseta adidas corrida grafica'
+  Camiseta Adidas Corrida Gráfica - Unissex
+    price=66.65 (BRL) | saleprice=0.0 | sku=FBA-83DX-060-03
+    link: click.linksynergy.com | imagem: sim
+  Camiseta Adidas Corrida Gráfica - Unissex
+    price=66.65 (BRL) | saleprice=0.0 | sku=FBA-83DX-060-05
+    link: click.linksynergy.com | imagem: sim
+  Camiseta Adidas Corrida Gráfica - Unissex
+    price=66.65 (BRL) | saleprice=0.0 | sku=FBA-83DX-060-02
+    link: click.linksynergy.com | imagem: sim
+  Motivos pelos quais o bot nao o escolheu:
+    - passa nos filtros, mas so entra se estiver entre os mais baratos da sua marca/categoria (2 por categoria) e se a busca devolver o item
+
+================================================================
+camiseta-adidas-adi365-masculina-vermelho-FBA-83DT-016
+================================================================
+Codigo do produto: FBA-83DT-016 | palavras do nome: camiseta adidas adi365 masculina vermelho
+Achei no feed (4 item(ns), 1 nome(s)) buscando por: 'camiseta adidas adi365 masculina'
+  Camiseta Adidas Adi365 Masculina - Masculino
+    price=77.77 (BRL) | saleprice=0.0 | sku=FBA-83DT-016-03
+    link: click.linksynergy.com | imagem: sim
+  Camiseta Adidas Adi365 Masculina - Masculino
+    price=77.77 (BRL) | saleprice=0.0 | sku=FBA-83DT-016-04
+    link: click.linksynergy.com | imagem: sim
+  Camiseta Adidas Adi365 Masculina - Masculino
+    price=77.77 (BRL) | saleprice=0.0 | sku=FBA-83DT-016-02
+    link: click.linksynergy.com | imagem: sim
+  Motivos pelos quais o bot nao o escolheu:
+    - passa nos filtros, mas so entra se estiver entre os mais baratos da sua marca/categoria (2 por categoria) e se a busca devolver o item
+
+================================================================
+camiseta-new-balance-athletics-graphic-masculina-marinho-39V-251V-012
+================================================================
+Codigo do produto: 39V-251V-012 | palavras do nome: camiseta new balance athletics graphic masculina marinho
+Achei no feed (4 item(ns), 1 nome(s)) buscando por: 'camiseta new balance athletics graphic'
+  Camiseta New Balance Athletics Graphic Masculina - Masculino
+    price=55.55 (BRL) | saleprice=0.0 | sku=39V-251V-012-02
+    link: click.linksynergy.com | imagem: sim
+  Camiseta New Balance Athletics Graphic Masculina - Masculino
+    price=55.55 (BRL) | saleprice=0.0 | sku=39V-251V-012-04
+    link: click.linksynergy.com | imagem: sim
+  Camiseta New Balance Athletics Graphic Masculina - Masculino
+    price=55.55 (BRL) | saleprice=0.0 | sku=39V-251V-012-03
+    link: click.linksynergy.com | imagem: sim
+  Motivos pelos quais o bot nao o escolheu:
+    - preco abaixo do piso de R$ 60
+
+Leitura: 'price' e o que o feed informa. O 'De R$' e o desconto que o outro grupo
+mostra costumam vir da vitrine do site e de cupom/pix, e nao aparecem no feed.
