@@ -35,8 +35,25 @@ OTHER_CATEGORIES = [  # além de tênis
     "legging", "mochila", "relógio", "chuteira",
 ]
 
-# Para as lojas grandes: as categorias + "tênis <marca>" (traz tênis de cada marca)
-BIG_TERMS = CATEGORY_TERMS + [f"tênis {brand}" for brand in BRAND_TERMS]
+# Marcas favoritas: cota mínima por loja grande, dentro do total (se houver produtos bons).
+# Cada cota segue o foco em tênis (70%); o resto da cota vem de outras categorias.
+FAVORITE_BRANDS = {"nike": 12, "adidas": 12}
+FAVORITE_CATEGORIES = ["camiseta", "camisa", "moletom", "jaqueta", "bermuda", "legging", "mochila"]
+
+# Modelos de Nike e Adidas que o público procura (buscas extras, para ter mais produtos deles)
+FAVORITE_MODEL_TERMS = [
+    "nike air max", "nike pegasus", "nike revolution", "nike downshifter", "nike air force",
+    "adidas samba", "adidas campus", "adidas superstar", "adidas lite racer", "adidas adi365",
+]
+
+# Para as lojas grandes: as categorias + "tênis <marca>" (traz tênis de cada marca) +
+# "<categoria> <marca favorita>" (mais roupas de Nike e Adidas) + modelos favoritos
+BIG_TERMS = (
+    CATEGORY_TERMS
+    + [f"tênis {brand}" for brand in BRAND_TERMS]
+    + [f"{category} {brand}" for brand in FAVORITE_BRANDS for category in FAVORITE_CATEGORIES]
+    + FAVORITE_MODEL_TERMS
+)
 
 # Público: só o infantil fica de fora (feminino e unissex entram)
 EXCLUDED_AUDIENCE_WORDS = ("infantil", "kids", "menino", "menina", "bebe", "juvenil")
@@ -81,15 +98,16 @@ def _store(mid: str, name: str, total: int, *, big: bool) -> dict:
         "pages": 2 if big else 1,
         "terms": BIG_TERMS if big else CATEGORY_TERMS,
         "sneaker_share": 0.7 if big else 0,   # 70% tênis nas lojas grandes
+        "favorites": FAVORITE_BRANDS if big else {},  # cota de Nike e Adidas só nas lojas grandes
         "require_brand": big,                 # marca conhecida obrigatória só nas lojas grandes
         "ranges": "default" if big else "team",
     }
 
 
 ADVERTISERS = {
-    # Os mais cobiçados: 30 produtos cada
-    "netshoes": [_store("43984", "Netshoes", 30, big=True)],
-    "zattini": [_store("43985", "Zattini", 30, big=True)],
+    # Os mais cobiçados: 40 produtos cada (12 Nike + 12 Adidas dentro do total)
+    "netshoes": [_store("43984", "Netshoes", 40, big=True)],
+    "zattini": [_store("43985", "Zattini", 40, big=True)],
     # Lojas de time: 2 produtos cada (o Cruzeiro fica com 5)
     "times": [
         _store("54199", "LojaNBA", 2, big=False),
@@ -286,11 +304,29 @@ def _round_robin(groups: dict, count: int) -> list:
     return chosen
 
 
-def pick_scored(items, advertiser, blocked_ids, used_ids, total):
+def _pick_quota(entries: list, count: int, share: float) -> list:
+    """`count` itens de uma marca (já em ordem de nota): `share` de tênis e o resto por categoria."""
+    sneakers = [e for e in entries if detect_category(e[1]["name"]) == "tenis"]
+    others: dict = {}
+    for entry in entries:
+        category = detect_category(entry[1]["name"])
+        if category != "tenis":
+            others.setdefault(category, []).append(entry)
+    chosen = sneakers[: math.ceil(count * share)]
+    chosen += _round_robin(others, count - len(chosen))
+    if len(chosen) < count:  # faltou em algum grupo: completa pelos de maior nota
+        taken = {e[0] for e in chosen}
+        chosen += [e for e in entries if e[0] not in taken][: count - len(chosen)]
+    return chosen
+
+
+def pick_scored(items, advertiser, blocked_ids, used_ids, total, preselected=()):
     """
     Até `total` produtos do anunciante, pelos de maior nota. Um post por produto (tamanhos
-    diferentes têm o mesmo nome). Nas lojas grandes, 70% são tênis (um de cada marca por
-    rodada); no resto, um de cada categoria por rodada. Devolve (ofertas, candidatos).
+    diferentes têm o mesmo nome). Primeiro vêm as cotas das marcas favoritas (Nike e Adidas,
+    descontando o que já foi escolhido em `preselected`, como campanhas); depois, nas lojas
+    grandes, 70% de tênis (um de cada marca por rodada) e, no resto, um de cada categoria por
+    rodada. Devolve (ofertas, candidatos).
     """
     if total <= 0:
         return [], 0
@@ -314,19 +350,38 @@ def pick_scored(items, advertiser, blocked_ids, used_ids, total):
     ranked.sort(key=lambda e: (e[2], real_discount(e[1]), -effective_price(e[1])), reverse=True)
 
     share = advertiser.get("sneaker_share", 0)
+
+    # 1) Cotas das marcas favoritas
+    picked: list = []
+    have: dict = {}
+    for offer in preselected:
+        brand = detect_brand(offer.get("productName", ""))
+        have[brand] = have.get(brand, 0) + 1
+    for brand, quota in advertiser.get("favorites", {}).items():
+        need = min(quota - have.get(brand, 0), total - len(picked))
+        if need > 0:
+            taken = {e[0] for e in picked}
+            entries = [e for e in ranked if detect_brand(e[1]["name"]) == brand and e[0] not in taken]
+            picked += _pick_quota(entries, need, share or 0.7)
+
+    # 2) O resto, pelos de maior nota
+    taken = {e[0] for e in picked}
+    rest = [e for e in ranked if e[0] not in taken]
     sneakers, others = {}, {}
-    for entry in ranked:
+    for entry in rest:
         category = detect_category(entry[1]["name"])
         if share and category == "tenis":
             sneakers.setdefault(detect_brand(entry[1]["name"]), []).append(entry)
         else:
             others.setdefault(category, []).append(entry)
 
-    picked = _round_robin(sneakers, math.ceil(total * share)) if share else []
-    picked += _round_robin(others, total - len(picked))
-    if len(picked) < total:  # faltou em algum grupo: completa pelos de maior nota que sobraram
-        taken = {entry[0] for entry in picked}
-        picked += [e for e in ranked if e[0] not in taken][: total - len(picked)]
+    remaining = total - len(picked)
+    extra = _round_robin(sneakers, math.ceil(remaining * share)) if share else []
+    extra += _round_robin(others, remaining - len(extra))
+    if len(extra) < remaining:  # faltou em algum grupo: completa pelos de maior nota que sobraram
+        done = {e[0] for e in extra}
+        extra += [e for e in rest if e[0] not in done][: remaining - len(extra)]
+    picked += extra
 
     offers = []
     for key, product, score in picked:

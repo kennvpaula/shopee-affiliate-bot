@@ -1,6 +1,6 @@
 """
 Ponto de entrada. Cada rodagem:
-  1. Busca ofertas: Shopee (4 marcas + top desconto/vendas/comissão) e, quando
+  1. Busca ofertas: Shopee (4 marcas + top desconto/vendas/comissão + casa) e, quando
      pedido, Rakuten (Netshoes, Zattini e lojas de time; os cupons da Rakuten
      vão junto dos produtos em que se aplicam)
   2. Aplica os filtros de qualidade e escolhe as ofertas de cada bloco, sem
@@ -14,7 +14,7 @@ Uso:
     python main.py --dry-run              só MOSTRA os posts (não envia, não grava)
     python main.py --only natura,vendas   só alguns blocos (bom pra testar)
 
-Blocos da Shopee:  boticario, natura, wepink, eudora, desconto, vendas, comissao
+Blocos da Shopee:  boticario, natura, wepink, eudora, desconto, vendas, comissao, casa
 Blocos da Rakuten: netshoes, zattini, times
 Pedir um bloco da Rakuten em --only já liga a Rakuten.
 """
@@ -87,6 +87,15 @@ def collect_brand_pool(shopee, key: str) -> list[dict]:
     return list(pool.values())
 
 
+def collect_home_pool(shopee) -> list[dict]:
+    pool: dict = {}
+    for keyword in selector.HOME_KEYWORDS:
+        for item in fetch_pool(shopee, keyword=keyword, sort_type=ShopeeClient.SORT_ITEM_SOLD_DESC, pages=selector.HOME_PAGES):
+            item.setdefault("_term", keyword)
+            pool.setdefault(item["itemId"], item)
+    return list(pool.values())
+
+
 def collect_general_pools(shopee) -> dict[str, list[dict]]:
     sold = fetch_pool(shopee, sort_type=ShopeeClient.SORT_ITEM_SOLD_DESC, pages=GENERAL_PAGES)
     commission = fetch_pool(shopee, sort_type=ShopeeClient.SORT_COMMISSION_DESC, pages=GENERAL_PAGES)
@@ -143,7 +152,8 @@ def build_rakuten_products(rakuten, key: str, blocked_ids: set[str], used: set[s
 
         # Os demais, pelos de maior nota (campanhas já ocupam parte do total)
         scored, candidates = rk.pick_scored(
-            pool, advertiser, blocked_ids, used, total=advertiser["total"] - len(campaign_offers)
+            pool, advertiser, blocked_ids, used,
+            total=advertiser["total"] - len(campaign_offers), preselected=campaign_offers,
         )
         sneakers = sum(1 for o in scored if rk.detect_category(o["productName"]) == "tenis")
         with_discount = sum(1 for o in scored if o.get("priceDiscountRate"))
@@ -152,6 +162,9 @@ def build_rakuten_products(rakuten, key: str, blocked_ids: set[str], used: set[s
             f"escolhidos={len(scored)} (máx. {advertiser['total']}; tênis={sneakers}, "
             f"com desconto no feed={with_discount})"
         )
+        if advertiser.get("favorites"):
+            count = lambda brand: sum(1 for o in campaign_offers + scored if rk.detect_brand(o["productName"]) == brand)
+            print("     marcas favoritas: " + ", ".join(f"{b}={count(b)}" for b in advertiser["favorites"]))
         picked = campaign_offers + scored
         passed = candidates
         with_coupon = rk.attach_coupons(picked, coupons)
@@ -183,7 +196,7 @@ def top_up_shopee(plan, general_pools, blocked_ids: set[str], used: set[str], bl
     shopee_keys = {key for kind, key, _ in blocks if kind == "shopee"}
     if general_pools is None or shopee_keys != {key for key, _ in selector.BLOCKS}:
         return  # só quando todos os blocos da Shopee rodam
-    total = sum(len(offers) for key, _, offers in plan if key in shopee_keys)
+    total = sum(len(offers) for key, _, offers in plan if key in shopee_keys and key != selector.HOME_KEY)
     missing = selector.SHOPEE_TARGET - total
     if missing <= 0:
         return
@@ -215,7 +228,11 @@ def build_plan(shopee, blocks, blocked_ids: set[str], dry_run: bool):
 
     for kind, key, label in blocks:
         if kind == "shopee":
-            if key in selector.BRANDS:
+            if key == selector.HOME_KEY:
+                pool = collect_home_pool(shopee)
+                picked, passed = selector.pick_home(pool, blocked_ids, used)
+                wanted = selector.HOME_COUNT
+            elif key in selector.BRANDS:
                 pool = collect_brand_pool(shopee, key)
                 picked, passed = selector.pick_brand(pool, key, blocked_ids, used)
                 wanted = selector.BRAND_COUNT

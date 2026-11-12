@@ -5,6 +5,5 @@ __pycache__/
 .DS_Store
 
 resultado_rakuten.txt
-diagnostico_*.txt
-
 resultado_marcas.txt
+diagnostico_*.txt

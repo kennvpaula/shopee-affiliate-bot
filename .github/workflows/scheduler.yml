@@ -29,7 +29,7 @@ concurrency:
 jobs:
   postar-ofertas:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     steps:
       - name: Baixar o código
         uses: actions/checkout@v4
@@ -60,8 +60,8 @@ jobs:
           # Os links dos grupos e as demais regras usam os padrões do código.
         run: |
           ARGS="$MANUAL_ARGS"
-          # A Rakuten entra só nas rodagens das 5h e das 12h (cron 07:50 e 14:50 UTC)
-          if [ "$SCHEDULE" = "50 7 * * *" ] || [ "$SCHEDULE" = "50 14 * * *" ]; then
+          # Toda rodagem agendada inclui a Rakuten (a manual usa o campo de opções)
+          if [ -n "$SCHEDULE" ]; then
             ARGS="--rakuten"
           fi
           python main.py $ARGS

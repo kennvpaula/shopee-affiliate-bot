@@ -16,15 +16,19 @@ O envio pelo WhatsApp Cloud API fica **desligado** (evita custo no cartão).
 **Total da Shopee: 50 produtos por rodagem** (28 das marcas + 22 das listas gerais). Se as marcas não
 completarem a cota (ex.: Wepink vazia), o que faltar vai para o top desconto.
 
-**Rakuten** (rodagens das 5h e das 12h)
+**Bloco CASA (utilidades e decoração): 20 produtos por rodagem, além dos 50 acima.** Busca por organizador, panela,
+tapete, cortina, decoração e outras (`HOME_KEYWORDS` em `core/selector.py`), com os mesmos filtros de nota e vendas
+(desconto mínimo de 10%, `HOME_MIN_DISCOUNT`). Escolhe um de cada busca por rodada, para variar. O reforço dos 50 não conta a CASA.
+
+**Rakuten** (todas as rodagens agendadas)
 
 | Bloco | Quantas | Como escolhe |
 |---|---|---|
-| Netshoes | 30 (70% tênis) | **nota por produto** (abaixo) |
-| Zattini | 30 (70% tênis) | **nota por produto** (abaixo) |
+| Netshoes | 40 (70% tênis) | **nota por produto** (abaixo) |
+| Zattini | 40 (70% tênis) | **nota por produto** (abaixo) |
 | Lojas de time (LojaNBA, Santos, São Paulo, Timão, Inter) | 2 cada | a mesma nota, com um produto de cada categoria |
 | Cruzeiro Store | 5 | a mesma nota |
-| Netshoes: campanhas de comissão | até 5 por campanha ativa | modelos com comissão especial, no topo e dentro dos 30 (veja abaixo) |
+| Netshoes: campanhas de comissão | até 5 por campanha ativa | modelos com comissão especial, no topo e dentro dos 40 (veja abaixo) |
 
 **A nota por produto** (em `core/rakuten_rules.py`, tudo editável no topo do arquivo):
 
@@ -35,7 +39,9 @@ completarem a cota (ex.: Wepink vazia), o que faltar vai para o top desconto.
 2. Pontos: modelo queridinho (`POPULAR_MODELS`), marca conhecida, desconto real do feed (as lojas de time
    informam), preço bem abaixo dos parecidos (mesma marca e categoria) e preço na metade de baixo da faixa.
 3. Variedade: tênis de uma marca por vez (em rodadas) e o resto por categoria; um post por produto, não por tamanho.
-4. O `--dry-run` mostra a nota de cada produto, para ajustar os pesos olhando o resultado.
+4. Marcas favoritas: **Nike e Adidas têm cota mínima de 12 produtos cada** em cada loja grande (`FAVORITE_BRANDS`),
+   também com foco em tênis; as campanhas de comissão contam para a cota. Para mudar, edite o número ou a marca.
+5. O `--dry-run` mostra a nota de cada produto, para ajustar os pesos olhando o resultado.
 
 - Netshoes e Zattini não informam preço promocional no feed (o `saleprice` vem 0 ou igual ao `price`): esses
   posts mostram só "Por R$ X", sem a linha "De". O "De" e o desconto do site vêm da vitrine e de cupom/pix,
@@ -66,7 +72,7 @@ python diagnostico_feed.py              # por que Netshoes/Zattini não têm pro
 python diagnostico_produtos.py          # como produtos de links da Netshoes aparecem no feed (só leitura)
 ```
 
-Blocos da Shopee: `boticario, natura, wepink, eudora, desconto, vendas, comissao`.
+Blocos da Shopee: `boticario, natura, wepink, eudora, desconto, vendas, comissao, casa`.
 Blocos da Rakuten: `netshoes, zattini, times`.
 
 ## Campanhas de comissão especial (Netshoes)
@@ -94,7 +100,7 @@ Campanhas de lista de SKUs ("Lista Especial") não dá para reconhecer pelo nome
 
 `.github/workflows/scheduler.yml` roda 7 vezes por dia (5h, 7h30, 10h, 12h, 15h, 17h
 e 19h de Brasília; cada rodagem começa ~10 min antes por causa dos atrasos do GitHub).
-A Rakuten entra nas rodagens das 5h e das 12h (`--rakuten`).
+A Rakuten entra em todas as rodagens agendadas (`--rakuten`); como cada rodagem completa leva ~15 minutos, o repositório deve ser **público** (uso ilimitado do GitHub Actions).
 
 Secrets do repositório (Settings > Secrets and variables > Actions):
 `SHOPEE_APP_ID`, `SHOPEE_APP_SECRET`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`,

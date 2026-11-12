@@ -9,6 +9,16 @@ BRAND_COUNT = 7      # ofertas por marca em cada rodagem
 GENERAL_COUNTS = {"desconto": 8, "vendas": 7, "comissao": 7}  # listas gerais: 22
 SHOPEE_TARGET = 50   # total por rodagem (marcas 28 + gerais 22); o que faltar nas marcas vai pro top desconto
 
+# Bloco CASA (utilidades e decoração): vem além dos 50 acima
+HOME_COUNT = 20
+HOME_MIN_DISCOUNT = 10
+HOME_PAGES = 2       # páginas por busca
+HOME_KEYWORDS = [
+    "organizador", "utensílios de cozinha", "panela", "jogo de cama", "toalha de banho",
+    "luminária", "potes herméticos", "tapete", "cortina", "almofada", "decoração",
+    "lixeira", "escorredor", "kit banheiro", "cabide", "garrafa térmica",
+]
+
 MAX_DISCOUNT = 60    # acima disso o desconto é tratado como suspeito (preço "de" inflado)
 BRAND_MIN_DISCOUNT = 5
 GENERAL_MIN_DISCOUNT = {"desconto": 20, "vendas": 15, "comissao": 10}
@@ -59,8 +69,14 @@ GENERAL_LABELS = {
     "comissao": "TOP COMISSÃO",
 }
 
+HOME_KEY, HOME_LABEL = "casa", "CASA"
+
 # Ordem em que os blocos são montados e postados
-BLOCKS = [(key, cfg["label"]) for key, cfg in BRANDS.items()] + list(GENERAL_LABELS.items())
+BLOCKS = (
+    [(key, cfg["label"]) for key, cfg in BRANDS.items()]
+    + list(GENERAL_LABELS.items())
+    + [(HOME_KEY, HOME_LABEL)]
+)
 
 
 # ------------------------------------------------------------ utilidades
@@ -195,5 +211,33 @@ def pick_general(pool, key, blocked_ids, used_ids, count=None):
     )
     candidates.sort(key=_GENERAL_SORT[key], reverse=True)
     chosen = _take(candidates, count)
+    used_ids.update(item_key(o) for o in chosen)
+    return chosen, len(candidates)
+
+
+def pick_home(pool, blocked_ids, used_ids, count=None):
+    """
+    Bloco CASA: até `count` ofertas, com variedade. Cada busca (organizador, panela,
+    tapete...) entrega o seu melhor por rodada; dentro de cada uma, mais vendidos primeiro.
+    Devolve (escolhidas, qtd_que_passou_nos_filtros).
+    """
+    count = count or HOME_COUNT
+    candidates = _eligible(pool, blocked_ids, used_ids, lambda o: True, HOME_MIN_DISCOUNT)
+
+    groups: dict = {}
+    for offer in candidates:
+        groups.setdefault(offer.get("_term", ""), []).append(offer)
+    for offers in groups.values():
+        offers.sort(key=lambda o: (sales_of(o), discount_of(o)), reverse=True)
+
+    # rodadas: o melhor de cada busca, depois o segundo melhor, e assim por diante
+    ordered, rnd = [], 0
+    while any(len(offers) > rnd for offers in groups.values()):
+        for term in sorted(groups, key=lambda t: sales_of(groups[t][0]), reverse=True):
+            if len(groups[term]) > rnd:
+                ordered.append(groups[term][rnd])
+        rnd += 1
+
+    chosen = _take(ordered, count)
     used_ids.update(item_key(o) for o in chosen)
     return chosen, len(candidates)

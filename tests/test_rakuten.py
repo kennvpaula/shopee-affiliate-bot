@@ -160,7 +160,7 @@ class ScoreTests(unittest.TestCase):
         offers, _ = self.pick(items, total=30)
         self.assertEqual(len(offers), 30)
         sneakers = [o for o in offers if rk.detect_category(o["productName"]) == "tenis"]
-        self.assertEqual(len(sneakers), 21)
+        self.assertGreaterEqual(len(sneakers), 21)                      # foco em tênis (70% ou mais)
         self.assertEqual(len({rk.detect_brand(o["productName"]) for o in sneakers}), 6)
 
     def test_zattini_usa_a_mesma_regra(self):
@@ -221,6 +221,65 @@ class ScoreTests(unittest.TestCase):
         self.assertNotIn("De R$", text)
         self.assertIn("Link ↘️", text)
         self.assertNotIn("Link com desconto", text)
+
+
+class FavoriteBrandTests(unittest.TestCase):
+    BRANDS = ("Nike", "Adidas", "Puma", "Asics", "Mizuno", "Olympikus", "Fila", "Vans")
+
+    def big_pool(self):
+        items = []
+        for brand in self.BRANDS:
+            items += [feed_item(f"Tênis {brand} Modelo {i}", 150.0 + i * 6) for i in range(12)]
+            items += [feed_item(f"Camiseta {brand} Linha {i}", 60.0 + i * 4) for i in range(6)]
+        return items
+
+    @staticmethod
+    def count(offers, brand):
+        return sum(1 for o in offers if rk.detect_brand(o["productName"]) == brand)
+
+    def test_nike_e_adidas_tem_cota_minima_com_foco_em_tenis(self):
+        offers, _ = rk.pick_scored(self.big_pool(), NETSHOES, set(), set(), NETSHOES["total"])
+        self.assertEqual(len(offers), NETSHOES["total"])
+        for brand in ("nike", "adidas"):
+            self.assertGreaterEqual(self.count(offers, brand), rk.FAVORITE_BRANDS[brand])
+            mine = [o for o in offers if rk.detect_brand(o["productName"]) == brand]
+            sneakers = [o for o in mine if rk.detect_category(o["productName"]) == "tenis"]
+            self.assertGreaterEqual(len(sneakers) / len(mine), 0.6)   # a cota também é de tênis
+        # as outras marcas continuam aparecendo
+        self.assertGreaterEqual(len({rk.detect_brand(o["productName"]) for o in offers}), 6)
+
+    def test_campanha_conta_para_a_cota_da_marca(self):
+        camp = campaign("Adidas Campus")
+        pre = rk.pick_campaign([feed_item(f"Tênis Adidas Campus Cor {i}", 400.0 + i) for i in range(5)],
+                               NETSHOES, camp, set(), set())
+        self.assertEqual(len(pre), 5)
+        offers, _ = rk.pick_scored(self.big_pool(), NETSHOES, set(), {o["itemId"] for o in pre}, 25, preselected=pre)
+        self.assertEqual(len(offers), 25)
+        self.assertGreaterEqual(self.count(offers, "adidas") + self.count(pre, "adidas"), rk.FAVORITE_BRANDS["adidas"])
+
+    def test_sem_produtos_da_marca_o_total_fecha_com_as_outras(self):
+        items = [i for i in self.big_pool() if rk.detect_brand(i["name"]) not in ("nike", "adidas")]
+        offers, _ = rk.pick_scored(items, NETSHOES, set(), set(), 30)
+        self.assertEqual(len(offers), 30)
+        self.assertEqual(self.count(offers, "nike") + self.count(offers, "adidas"), 0)
+
+    def test_lojas_de_time_nao_tem_cota_de_marca(self):
+        self.assertTrue(all(not a["favorites"] for a in rk.ADVERTISERS["times"]))
+        self.assertEqual(NETSHOES["favorites"], {"nike": 12, "adidas": 12})
+        self.assertEqual(ZATTINI["favorites"], {"nike": 12, "adidas": 12})
+        self.assertEqual((NETSHOES["total"], ZATTINI["total"]), (40, 40))
+
+    def test_busca_traz_mais_roupa_de_nike_e_adidas(self):
+        for term in ("camiseta nike", "moletom adidas", "jaqueta nike", "mochila adidas"):
+            self.assertIn(term, rk.BIG_TERMS)
+
+    def test_busca_traz_modelos_favoritos_de_nike_e_adidas(self):
+        for term in ("nike air max", "nike pegasus", "adidas samba", "adidas campus"):
+            self.assertIn(term, rk.BIG_TERMS)
+
+    def test_lojas_de_time_nao_buscam_modelos_de_marca(self):
+        for advertiser in rk.ADVERTISERS["times"]:
+            self.assertNotIn("nike air max", advertiser["terms"])
 
 
 class CaptionTests(unittest.TestCase):

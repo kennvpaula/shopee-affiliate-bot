@@ -121,3 +121,51 @@ class SelectorTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class HomeBlockTests(unittest.TestCase):
+    def home_offer(self, i, term, **kw):
+        base = dict(itemId=1000 + i, productName=f"{term} modelo {i}", _term=term,
+                    priceDiscountRate=15, sales=500 - i, shopId=i)
+        base.update(kw)
+        return offer(**base)
+
+    def pool(self):
+        terms = ["organizador", "panela", "tapete", "cortina"]
+        return [self.home_offer(n * 10 + k, t) for n, t in enumerate(terms) for k in range(10)]
+
+    def test_casa_entra_nos_blocos_depois_das_listas_gerais(self):
+        keys = [key for key, _ in selector.BLOCKS]
+        self.assertEqual(keys[-1], "casa")
+        self.assertEqual(dict(selector.BLOCKS)["casa"], "CASA")
+        self.assertEqual(selector.HOME_COUNT, 20)
+
+    def test_escolhe_20_com_variedade_de_buscas(self):
+        chosen, passed = selector.pick_home(self.pool(), set(), set())
+        self.assertEqual(len(chosen), 20)
+        self.assertEqual(passed, 40)
+        por_busca = {}
+        for o in chosen:
+            por_busca[o["_term"]] = por_busca.get(o["_term"], 0) + 1
+        self.assertEqual(set(por_busca.values()), {5})   # 4 buscas, 5 de cada
+
+    def test_nao_repete_bloqueados_nem_usados(self):
+        blocked = {"1000", "1001"}
+        used = {"1002"}
+        chosen, _ = selector.pick_home(self.pool(), blocked, used)
+        ids = {str(o["itemId"]) for o in chosen}
+        self.assertFalse(ids & {"1000", "1001", "1002"})
+
+    def test_filtros_de_qualidade_valem_na_casa(self):
+        ruins = [
+            self.home_offer(900, "panela", ratingStar="3.5"),            # nota baixa
+            self.home_offer(901, "panela", priceDiscountRate=0),         # sem desconto
+            self.home_offer(902, "panela", priceDiscountRate=80),        # desconto suspeito
+            self.home_offer(903, "panela", productName="Panela similar"),  # nome bloqueado
+        ]
+        chosen, passed = selector.pick_home(ruins, set(), set())
+        self.assertEqual((len(chosen), passed), (0, 0))
+
+    def test_usa_o_que_tem_quando_faltam_produtos(self):
+        chosen, _ = selector.pick_home(self.pool()[:7], set(), set())
+        self.assertEqual(len(chosen), 7)
