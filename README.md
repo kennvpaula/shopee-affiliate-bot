@@ -10,15 +10,18 @@ O envio pelo WhatsApp Cloud API fica **desligado** (evita custo no cartão).
 
 | Bloco | Quantas | Como escolhe |
 |---|---|---|
-| Boticário, Natura, Wepink, Eudora | até 7 cada | maior desconto, depois maior comissão |
 | Top desconto / vendas / comissão | 8 / 7 / 7 | critério do nome, com filtros de qualidade |
+| CASA (utilidades e decoração) | 48 | um de cada busca por rodada, para variar; mais vendidos primeiro |
 
-**Total da Shopee: 50 produtos por rodagem** (28 das marcas + 22 das listas gerais). Se as marcas não
-completarem a cota (ex.: Wepink vazia), o que faltar vai para o top desconto.
+**Total da Shopee: 70 produtos por rodagem** (22 das listas gerais + 48 de casa). Se as listas gerais não
+completarem a cota, o que faltar vai para o top desconto.
 
-**Bloco CASA (utilidades e decoração): 20 produtos por rodagem, além dos 50 acima.** Busca por organizador, panela,
-tapete, cortina, decoração e outras (`HOME_KEYWORDS` em `core/selector.py`), com os mesmos filtros de nota e vendas
-(desconto mínimo de 10%, `HOME_MIN_DISCOUNT`). Escolhe um de cada busca por rodada, para variar. O reforço dos 50 não conta a CASA.
+**Bloco CASA:** busca por 32 termos (organizador, panela, tapete, cortina, edredom, decoração e outros, em
+`HOME_KEYWORDS` no `core/selector.py`), 3 páginas cada, com os mesmos filtros de nota e vendas das outras listas
+(desconto mínimo de 10%, `HOME_MIN_DISCOUNT`). Ele ficou com as vagas que eram das marcas de beleza.
+
+**Marcas de beleza desligadas.** Boticário, Natura, Wepink e Eudora saíram das rodagens. As regras delas continuam em
+`BRANDS` no `core/selector.py`; para religar, coloque a chave em `ACTIVE_BRANDS` (ex.: `["natura"]`).
 
 **Rakuten** (todas as rodagens agendadas)
 
@@ -63,7 +66,7 @@ tapete, cortina, decoração e outras (`HOME_KEYWORDS` em `core/selector.py`), c
 python main.py                          # Shopee
 python main.py --rakuten                # Shopee + Rakuten
 python main.py --dry-run                # só MOSTRA os posts (não envia nem grava)
-python main.py --only natura,vendas     # só alguns blocos
+python main.py --only casa,vendas       # só alguns blocos
 python main.py --only netshoes,zattini --dry-run
 python -m unittest tests.test_logic tests.test_rakuten -v   # testes das regras
 python test_marcas.py                   # lojas/vendedores por marca na Shopee (só leitura)
@@ -72,7 +75,7 @@ python diagnostico_feed.py              # por que Netshoes/Zattini não têm pro
 python diagnostico_produtos.py          # como produtos de links da Netshoes aparecem no feed (só leitura)
 ```
 
-Blocos da Shopee: `boticario, natura, wepink, eudora, desconto, vendas, comissao, casa`.
+Blocos da Shopee: `desconto, vendas, comissao, casa`.
 Blocos da Rakuten: `netshoes, zattini, times`.
 
 ## Campanhas de comissão especial (Netshoes)
@@ -94,7 +97,7 @@ Campanhas de lista de SKUs ("Lista Especial") não dá para reconhecer pelo nome
      Client ID e Client Secret da sua Application no portal de desenvolvedor:
      `[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes('ID:SECRET'))`
    - O token da Rakuten dura 1 hora e o bot pede um novo sozinho a cada rodagem.
-4. Teste: `python main.py --dry-run --only natura` e `python main.py --dry-run --only netshoes,zattini`.
+4. Teste: `python main.py --dry-run --only casa` e `python main.py --dry-run --only netshoes,zattini`.
 
 ## Agendamento (GitHub Actions)
 
@@ -108,7 +111,7 @@ Secrets do repositório (Settings > Secrets and variables > Actions):
 `RAKUTEN_ACCOUNT_ID`. Sem os dois da Rakuten, as rodagens seguem só com a Shopee.
 
 Rodar à mão: aba Actions > "Rodagem de ofertas Shopee" > Run workflow. No campo de
-opções use `--dry-run`, `--rakuten` ou `--only natura,netshoes`.
+opções use `--dry-run`, `--rakuten` ou `--only casa,netshoes`.
 
 ## Observações
 

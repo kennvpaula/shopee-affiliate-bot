@@ -1,6 +1,6 @@
 """
 Ponto de entrada. Cada rodagem:
-  1. Busca ofertas: Shopee (4 marcas + top desconto/vendas/comissão + casa) e, quando
+  1. Busca ofertas: Shopee (top desconto/vendas/comissão + casa) e, quando
      pedido, Rakuten (Netshoes, Zattini e lojas de time; os cupons da Rakuten
      vão junto dos produtos em que se aplicam)
   2. Aplica os filtros de qualidade e escolhe as ofertas de cada bloco, sem
@@ -12,9 +12,9 @@ Uso:
     python main.py                        Shopee (rodagem comum)
     python main.py --rakuten              Shopee + Rakuten
     python main.py --dry-run              só MOSTRA os posts (não envia, não grava)
-    python main.py --only natura,vendas   só alguns blocos (bom pra testar)
+    python main.py --only casa,vendas    só alguns blocos (bom pra testar)
 
-Blocos da Shopee:  boticario, natura, wepink, eudora, desconto, vendas, comissao, casa
+Blocos da Shopee:  desconto, vendas, comissao, casa  (as 4 marcas de beleza estão desligadas: ACTIVE_BRANDS em core/selector.py)
 Blocos da Rakuten: netshoes, zattini, times
 Pedir um bloco da Rakuten em --only já liga a Rakuten.
 """
@@ -371,7 +371,7 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Bot de ofertas Shopee e Rakuten -> Telegram")
     parser.add_argument("--dry-run", action="store_true", help="só mostra os posts, não envia nem grava")
     parser.add_argument("--rakuten", action="store_true", help="inclui os blocos da Rakuten")
-    parser.add_argument("--only", default="", help="blocos separados por vírgula (ex: natura,vendas,netshoes)")
+    parser.add_argument("--only", default="", help="blocos separados por vírgula (ex: casa,vendas,netshoes)")
     args = parser.parse_args(argv)
 
     valid = {key for key, _ in selector.BLOCKS} | {key for key, _ in rk.RAKUTEN_BLOCKS}

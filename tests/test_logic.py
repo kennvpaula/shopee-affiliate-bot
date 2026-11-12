@@ -109,11 +109,15 @@ class SelectorTests(unittest.TestCase):
         self.assertEqual(desconto[0]["itemId"], 3)
         self.assertEqual(comissao[0]["itemId"], 3)
 
-    def test_shopee_totaliza_50_por_rodagem(self):
-        brands = selector.BRAND_COUNT * len(selector.BRANDS)
+    def test_marcas_de_beleza_desligadas_e_totais(self):
+        self.assertEqual(selector.ACTIVE_BRANDS, [])
+        keys = [key for key, _ in selector.BLOCKS]
+        self.assertEqual(keys, ["desconto", "vendas", "comissao", "casa"])
+        brands = selector.BRAND_COUNT * len(selector.ACTIVE_BRANDS)
         general = sum(selector.GENERAL_COUNTS.values())
         self.assertEqual(brands + general, selector.SHOPEE_TARGET)
-        self.assertEqual(selector.SHOPEE_TARGET, 50)
+        self.assertEqual(selector.SHOPEE_TARGET, 22)
+        self.assertEqual(selector.HOME_COUNT, 48)   # 20 + as 28 vagas das marcas
         pool = [offer(itemId=i, shopId=i % 5, priceDiscountRate=25 + i % 10, sales=100 + i) for i in range(1, 40)]
         chosen, _ = selector.pick_general(pool, "desconto", set(), set())
         self.assertEqual(len(chosen), selector.GENERAL_COUNTS["desconto"])
@@ -138,10 +142,9 @@ class HomeBlockTests(unittest.TestCase):
         keys = [key for key, _ in selector.BLOCKS]
         self.assertEqual(keys[-1], "casa")
         self.assertEqual(dict(selector.BLOCKS)["casa"], "CASA")
-        self.assertEqual(selector.HOME_COUNT, 20)
 
     def test_escolhe_20_com_variedade_de_buscas(self):
-        chosen, passed = selector.pick_home(self.pool(), set(), set())
+        chosen, passed = selector.pick_home(self.pool(), set(), set(), count=20)
         self.assertEqual(len(chosen), 20)
         self.assertEqual(passed, 40)
         por_busca = {}

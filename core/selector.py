@@ -5,21 +5,27 @@ Mexa nas constantes abaixo para deixar o filtro mais rígido ou mais solto.
 import unicodedata
 
 # ---------------------------------------------------------------- ajustes
-BRAND_COUNT = 7      # ofertas por marca em cada rodagem
+BRAND_COUNT = 7      # ofertas por marca em cada rodagem (só vale para as marcas em ACTIVE_BRANDS)
+ACTIVE_BRANDS: list[str] = []   # marcas de beleza DESLIGADAS: as vagas foram para o bloco CASA.
+                                # Para religar, ex.: ["natura", "eudora"] (as regras ficam em BRANDS abaixo)
 GENERAL_COUNTS = {"desconto": 8, "vendas": 7, "comissao": 7}  # listas gerais: 22
-SHOPEE_TARGET = 50   # total por rodagem (marcas 28 + gerais 22); o que faltar nas marcas vai pro top desconto
 
-# Bloco CASA (utilidades e decoração): vem além dos 50 acima
-HOME_COUNT = 20
+# Bloco CASA (utilidades e decoração). Ficou com as vagas das 4 marcas de beleza (20 + 28)
+HOME_COUNT = 48
 HOME_MIN_DISCOUNT = 10
-HOME_PAGES = 2       # páginas por busca
+HOME_PAGES = 3       # páginas por busca
 HOME_KEYWORDS = [
     "organizador", "utensílios de cozinha", "panela", "jogo de cama", "toalha de banho",
     "luminária", "potes herméticos", "tapete", "cortina", "almofada", "decoração",
     "lixeira", "escorredor", "kit banheiro", "cabide", "garrafa térmica",
+    "frigideira", "marmita", "organizador de geladeira", "tábua de corte", "cesto de roupa",
+    "varal", "porta temperos", "vaso decorativo", "quadro decorativo", "edredom",
+    "lençol", "travesseiro", "cobertor", "espelho", "kit facas", "assadeira",
 ]
 
 MAX_DISCOUNT = 60    # acima disso o desconto é tratado como suspeito (preço "de" inflado)
+# Total das listas da Shopee fora da CASA (marcas ativas + gerais); o que faltar nas marcas vai pro top desconto
+SHOPEE_TARGET = BRAND_COUNT * len(ACTIVE_BRANDS) + sum(GENERAL_COUNTS.values())
 BRAND_MIN_DISCOUNT = 5
 GENERAL_MIN_DISCOUNT = {"desconto": 20, "vendas": 15, "comissao": 10}
 
@@ -73,7 +79,7 @@ HOME_KEY, HOME_LABEL = "casa", "CASA"
 
 # Ordem em que os blocos são montados e postados
 BLOCKS = (
-    [(key, cfg["label"]) for key, cfg in BRANDS.items()]
+    [(key, cfg["label"]) for key, cfg in BRANDS.items() if key in ACTIVE_BRANDS]
     + list(GENERAL_LABELS.items())
     + [(HOME_KEY, HOME_LABEL)]
 )
