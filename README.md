@@ -123,3 +123,13 @@ opções use `--dry-run`, `--rakuten` ou `--only casa,netshoes`.
 - A `token-key` da Rakuten vale como senha (é o Client ID e o Secret codificados em
   base64, não criptografados): nunca a coloque no chat nem no código.
 - Religar o WhatsApp Cloud API: `WHATSAPP_ENABLED=true` + variáveis do WhatsApp.
+
+
+## Como o bot evita repetidos
+
+- Um produto enviado não volta por **3 dias** (`COOLDOWN_DAYS`). O bloqueio vale pelo ID **e pelo título** (as 7 primeiras
+  palavras), então o mesmo produto de outro vendedor também fica de fora.
+- Ao ler o Supabase, a lista é ordenada por ID. Sem isso, com mais de 1.000 envios nos últimos dias, a paginação podia
+  pular linhas e deixar repetidos passarem.
+- Antes de enviar, o bot lê o Supabase de novo e tira o que outra rodagem (GitHub ou seu PC) enviou enquanto ele buscava.
+- Se não houver produto novo suficiente, o bot posta menos. Ele não completa a cota com repetidos.

@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, timezone
 from supabase import Client, create_client
 
 from config.settings import settings
+from core.selector import name_key
 
 _client: Client | None = None
 _PAGE = 1000  # o Supabase devolve no máximo 1000 linhas por consulta
@@ -23,7 +24,10 @@ def get_client() -> Client:
 
 
 def get_recent_item_ids(days: int) -> set[str]:
-    """IDs das ofertas enviadas nos últimos `days` dias (essas não são escolhidas de novo)."""
+    """
+    Chaves das ofertas enviadas nos últimos `days` dias (essas não são escolhidas de novo):
+    o ID de cada uma e também a chave do título ("n:..."), que pega o mesmo produto de outro vendedor.
+    """
     since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
     client = get_client()
     ids: set[str] = set()
@@ -31,13 +35,18 @@ def get_recent_item_ids(days: int) -> set[str]:
     while True:
         response = (
             client.table("sent_offers")
-            .select("item_id")
+            .select("item_id,product_name")
             .gte("sent_at", since)
+            .order("item_id")  # sem ordem fixa, a paginação pode pular linhas e deixar repetidos passarem
             .range(start, start + _PAGE - 1)
             .execute()
         )
         rows = response.data or []
-        ids.update(str(row["item_id"]) for row in rows)
+        for row in rows:
+            ids.add(str(row["item_id"]))
+            title_key = name_key({"productName": row.get("product_name")})
+            if title_key:
+                ids.add(title_key)
         if len(rows) < _PAGE:
             return ids
         start += _PAGE

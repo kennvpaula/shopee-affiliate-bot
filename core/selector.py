@@ -2,6 +2,7 @@
 Regras de escolha das ofertas (sem rede, fácil de testar e de ajustar).
 Mexa nas constantes abaixo para deixar o filtro mais rígido ou mais solto.
 """
+import re
 import unicodedata
 
 # ---------------------------------------------------------------- ajustes
@@ -122,6 +123,24 @@ def item_key(offer: dict) -> str:
     return str(offer.get("itemId"))
 
 
+NAME_WORDS = 7  # quantas palavras do título identificam "o mesmo produto"
+
+
+def name_key(offer: dict) -> str:
+    """
+    Chave pelo título: pega o mesmo produto anunciado por vendedores diferentes (IDs diferentes).
+    Vazia se o título for curto demais para comparar com segurança.
+    """
+    words = re.sub(r"[^a-z0-9]+", " ", norm(offer.get("productName"))).split()
+    return "n:" + " ".join(words[:NAME_WORDS]) if len(words) >= 3 else ""
+
+
+def remember(used_ids: set, offers: list) -> None:
+    """Marca como usadas (nesta rodagem) as ofertas escolhidas: pelo ID e pelo título."""
+    used_ids.update(item_key(o) for o in offers)
+    used_ids.update(k for k in (name_key(o) for o in offers) if k)
+
+
 def is_trusted_shop(offer: dict) -> bool:
     shop_type = offer.get("shopType") or []
     if not isinstance(shop_type, list):
@@ -159,11 +178,16 @@ def _eligible(pool, blocked_ids, used_ids, accept, min_discount) -> list[dict]:
     result, seen = [], set()
     for offer in pool:
         key = item_key(offer)
+        nkey = name_key(offer)
         if key in blocked_ids or key in used_ids or key in seen:
+            continue
+        if nkey and (nkey in blocked_ids or nkey in used_ids or nkey in seen):
             continue
         if not accept(offer) or not is_good_offer(offer, min_discount):
             continue
         seen.add(key)
+        if nkey:
+            seen.add(nkey)
         result.append(offer)
     return result
 
@@ -198,7 +222,7 @@ def pick_brand(pool, key, blocked_ids, used_ids, count=BRAND_COUNT):
     candidates = _eligible(pool, blocked_ids, used_ids, accept, BRAND_MIN_DISCOUNT)
     candidates.sort(key=lambda o: (discount_of(o), commission_of(o)), reverse=True)
     chosen = _take(candidates, count)
-    used_ids.update(item_key(o) for o in chosen)
+    remember(used_ids, chosen)
     return chosen, len(candidates)
 
 
@@ -217,7 +241,7 @@ def pick_general(pool, key, blocked_ids, used_ids, count=None):
     )
     candidates.sort(key=_GENERAL_SORT[key], reverse=True)
     chosen = _take(candidates, count)
-    used_ids.update(item_key(o) for o in chosen)
+    remember(used_ids, chosen)
     return chosen, len(candidates)
 
 
@@ -245,5 +269,5 @@ def pick_home(pool, blocked_ids, used_ids, count=None):
         rnd += 1
 
     chosen = _take(ordered, count)
-    used_ids.update(item_key(o) for o in chosen)
+    remember(used_ids, chosen)
     return chosen, len(candidates)

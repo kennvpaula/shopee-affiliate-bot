@@ -333,6 +333,31 @@ def send_plan(plan, dry_run: bool) -> int:
 
 
 # --------------------------------------------------------------- principal
+def drop_sent_meanwhile(plan):
+    """
+    A busca leva alguns minutos. Antes de enviar, lê o Supabase de novo e tira da lista o que
+    outra rodagem (a do GitHub ou a do seu PC) já enviou nesse meio tempo.
+    """
+    try:
+        fresh = get_recent_item_ids(settings.COOLDOWN_DAYS)
+    except Exception as exc:
+        print(f"[AVISO] Não consegui reconferir o Supabase antes de enviar: {unwrap_error(exc)}")
+        return plan
+    removed, new_plan = 0, []
+    for key, label, offers in plan:
+        kept = []
+        for offer in offers:
+            title_key = selector.name_key(offer)
+            if selector.item_key(offer) in fresh or (title_key and title_key in fresh):
+                removed += 1
+                continue
+            kept.append(offer)
+        new_plan.append((key, label, kept))
+    if removed:
+        print(f"[INFO] {removed} oferta(s) já tinham sido enviadas por outra rodagem enquanto esta buscava; ficaram de fora.")
+    return new_plan
+
+
 def run(only: set[str] | None = None, dry_run: bool = False, include_rakuten: bool = False) -> int:
     shopee = ShopeeClient()
 
@@ -346,11 +371,16 @@ def run(only: set[str] | None = None, dry_run: bool = False, include_rakuten: bo
         print(f"[AVISO] {message}\n[AVISO] Seguindo sem checar repetidas (é só simulação).")
         blocked_ids = set()
 
-    print(f"[INFO] {len(blocked_ids)} oferta(s) enviada(s) nos últimos {settings.COOLDOWN_DAYS} dia(s) (não repetem).")
+    recent = sum(1 for key in blocked_ids if not key.startswith("n:"))
+    print(f"[INFO] {recent} oferta(s) enviada(s) nos últimos {settings.COOLDOWN_DAYS} dia(s) (não repetem).")
     blocks = resolve_blocks(only, include_rakuten)
     plan = build_plan(shopee, blocks, blocked_ids, dry_run)
     total = sum(len(offers) for _, _, offers in plan)
     print(f"[INFO] {total} oferta(s) escolhida(s) nesta rodagem.")
+
+    if not dry_run:
+        plan = drop_sent_meanwhile(plan)
+        total = sum(len(offers) for _, _, offers in plan)
 
     sent = send_plan(plan, dry_run)
     if dry_run:

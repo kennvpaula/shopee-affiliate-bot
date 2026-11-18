@@ -24,6 +24,8 @@ def offer(**kw):
         "offerLink": "https://shope.ee/x", "shopId": 1, "shopType": [2],
     }
     base.update(kw)
+    if "productName" not in kw:  # cada oferta de teste tem um título próprio, como no mundo real
+        base["productName"] = f"Perfume Natura Humor modelo {base['itemId']}"
     return base
 
 
@@ -79,7 +81,7 @@ class SelectorTests(unittest.TestCase):
         for o in chosen:
             per_shop[o["shopId"]] = per_shop.get(o["shopId"], 0) + 1
         self.assertLessEqual(max(per_shop.values()), 2)
-        self.assertEqual(len(used), selector.BRAND_COUNT)
+        self.assertEqual(len([k for k in used if not k.startswith("n:")]), selector.BRAND_COUNT)
 
         # segunda chamada (outro bloco) não pode repetir as já usadas
         chosen2, _ = selector.pick_brand(pool, "natura", set(), used)
@@ -172,3 +174,66 @@ class HomeBlockTests(unittest.TestCase):
     def test_usa_o_que_tem_quando_faltam_produtos(self):
         chosen, _ = selector.pick_home(self.pool()[:7], set(), set())
         self.assertEqual(len(chosen), 7)
+
+
+class RepeatedProductTests(unittest.TestCase):
+    def test_chave_do_titulo_ignora_vendedor_pontuacao_e_acento(self):
+        a = offer(itemId=1, productName="Organizador Multiuso Cozinha 5 Divisórias Gaveta Plástico - Preto")
+        b = offer(itemId=2, productName="organizador multiuso, cozinha 5 divisorias gaveta plastico (azul)")
+        self.assertEqual(selector.name_key(a), selector.name_key(b))
+        self.assertTrue(selector.name_key(a).startswith("n:"))
+
+    def test_titulo_curto_nao_gera_chave(self):
+        self.assertEqual(selector.name_key(offer(itemId=1, productName="Panela")), "")
+
+    def test_mesmo_produto_de_outro_vendedor_nao_entra_na_mesma_rodagem(self):
+        pool = [
+            offer(itemId=10, productName="Jogo de Panelas Antiaderente 5 Peças Vermelho", sales=900, shopId=1),
+            offer(itemId=11, productName="Jogo de Panelas Antiaderente 5 Peças Vermelho", sales=800, shopId=2),
+            offer(itemId=12, productName="Escorredor de Louças Inox Dobrável", sales=700, shopId=3),
+        ]
+        chosen, _ = selector.pick_general(pool, "vendas", set(), set())
+        self.assertEqual(sorted(o["itemId"] for o in chosen), [10, 12])
+
+    def test_bloqueia_pelo_titulo_de_um_envio_anterior(self):
+        antigo = offer(itemId=99, productName="Escorredor de Louças Inox Dobrável Cozinha")
+        blocked = {"99", selector.name_key(antigo)}
+        novo = offer(itemId=500, productName="Escorredor de Louças Inox Dobrável Cozinha", shopId=7)
+        outro = offer(itemId=501, productName="Tapete Antiderrapante Banheiro Microfibra", shopId=8)
+        chosen, _ = selector.pick_general([novo, outro], "vendas", blocked, set())
+        self.assertEqual([o["itemId"] for o in chosen], [501])
+
+    def test_bloqueia_pelo_id(self):
+        chosen, _ = selector.pick_general([offer(itemId=7)], "vendas", {"7"}, set())
+        self.assertEqual(chosen, [])
+
+    def test_nao_repete_entre_blocos_da_mesma_rodagem(self):
+        used = set()
+        pool = [offer(itemId=i, productName=f"Produto exclusivo numero {i} para casa", shopId=i) for i in range(1, 30)]
+        a, _ = selector.pick_general(pool, "desconto", set(), used)
+        b, _ = selector.pick_general(pool, "vendas", set(), used)
+        self.assertFalse({o["itemId"] for o in a} & {o["itemId"] for o in b})
+
+
+class SentMeanwhileTests(unittest.TestCase):
+    def test_tira_o_que_outra_rodagem_enviou_no_meio_tempo(self):
+        import sys, types
+        for name, attrs in {"httpx": {"Response": object}}.items():
+            sys.modules.setdefault(name, types.ModuleType(name)).__dict__.update(attrs)
+        tn = sys.modules.setdefault("tenacity", types.ModuleType("tenacity"))
+        tn.retry = lambda *a, **k: (lambda f: f); tn.stop_after_attempt = tn.wait_exponential = lambda *a, **k: None
+        sb = sys.modules.setdefault("supabase", types.ModuleType("supabase"))
+        sb.create_client = lambda *a, **k: None; sb.Client = object
+        import main
+
+        a = offer(itemId=1, productName="Escorredor de Louças Inox Dobrável")
+        b = offer(itemId=2, productName="Tapete Antiderrapante Banheiro Microfibra")
+        c = offer(itemId=3, productName="Escorredor de Louças Inox Dobrável")  # mesmo título de outro vendedor
+        plan = [("casa", "CASA", [a, b, c])]
+        original = main.get_recent_item_ids
+        main.get_recent_item_ids = lambda days: {"2"} | {selector.name_key(a)}
+        try:
+            new_plan = main.drop_sent_meanwhile(plan)
+        finally:
+            main.get_recent_item_ids = original
+        self.assertEqual(new_plan[0][2], [])  # a e c pelo título, b pelo ID
