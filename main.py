@@ -37,7 +37,7 @@ GENERAL_PAGES = 5  # páginas por lista geral (Shopee)
 FETCH_DELAY = 1.0  # pausa entre consultas à Shopee (mais lenta: a Shopee devolveu muitos "System Error" com 0,4 s)
 RAKUTEN_PAGE_SIZE = 100
 RAKUTEN_MAX_FAIL_STREAK = 3  # depois de 3 falhas seguidas, desiste da Rakuten nesta rodagem
-STATE = {"fetch_errors": 0, "rakuten_fail_streak": 0, "rakuten_down": False}
+STATE = {"fetch_errors": 0, "fail_streak": 0, "rakuten_fail_streak": 0, "rakuten_down": False}
 
 
 def unwrap_error(exc: Exception) -> Exception:
@@ -51,6 +51,10 @@ def unwrap_error(exc: Exception) -> Exception:
 
 
 # ------------------------------------------------------------ Shopee: busca
+FAIL_STREAK_LIMIT = 5   # falhas seguidas até dar uma pausa maior (a Shopee parece sobrecarregada)
+FAIL_STREAK_PAUSE = 20  # segundos
+
+
 def fetch_pool(shopee, *, keyword="", shop_id=None, sort_type=None, pages=2) -> list[dict]:
     items: list[dict] = []
     for page in range(1, pages + 1):
@@ -59,8 +63,14 @@ def fetch_pool(shopee, *, keyword="", shop_id=None, sort_type=None, pages=2) -> 
                 keyword=keyword, limit=PAGE_SIZE, page=page,
                 sort_type=sort_type, shop_id=shop_id,
             )
+            STATE["fail_streak"] = 0
         except Exception as exc:
             STATE["fetch_errors"] += 1
+            STATE["fail_streak"] = STATE.get("fail_streak", 0) + 1
+            if STATE["fail_streak"] >= FAIL_STREAK_LIMIT:
+                print(f"[INFO] {STATE['fail_streak']} falhas seguidas da Shopee: pausa de {FAIL_STREAK_PAUSE} s para ela respirar.")
+                time.sleep(FAIL_STREAK_PAUSE)
+                STATE["fail_streak"] = 0
             print(
                 f"[AVISO] Falha na busca (keyword='{keyword}', loja={shop_id}, "
                 f"página {page}): {unwrap_error(exc)}"

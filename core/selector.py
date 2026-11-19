@@ -14,7 +14,7 @@ GENERAL_COUNTS = {"desconto": 8, "vendas": 7, "comissao": 7}  # listas gerais: 2
 # Bloco CASA (utilidades e decoração). Ficou com as vagas das 4 marcas de beleza (20 + 28)
 HOME_COUNT = 48
 HOME_MIN_DISCOUNT = 10
-HOME_PAGES = 3       # páginas por busca
+HOME_PAGES = 2       # páginas por busca (20 itens cada; 32 buscas já dão mais produtos do que as 48 vagas)
 HOME_KEYWORDS = [
     "organizador", "utensílios de cozinha", "panela", "jogo de cama", "toalha de banho",
     "luminária", "potes herméticos", "tapete", "cortina", "almofada", "decoração",
